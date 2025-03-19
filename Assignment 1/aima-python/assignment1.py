@@ -95,7 +95,18 @@ class ZenPuzzleGarden(Problem):
     
 # Task 3
 # Implement an A* heuristic cost function and assign it to the variable below.
-astar_heuristic_cost = None
+# def get_astar_hc(state):
+#     map = [list(row) for row in state[0]]
+    
+#     unsolved_tiles = 0
+    
+#     for row in map:
+#         for tile in row:
+#             if (tile == ""):
+#                 unsolved_tiles += 1
+
+# astar_heuristic_cost = lambda node: sum(row.count("") for row in node.state[0])
+
 
 def beam_search(problem, f, beam_width):
     # Task 4
@@ -129,7 +140,7 @@ if __name__ == "__main__":
     
 
     # Task 3 test code
-    '''
+    
     print('Running A* search.')
     before_time = time()
     node = astar_search(garden, astar_heuristic_cost)
@@ -140,7 +151,7 @@ if __name__ == "__main__":
         animate(node)
     else:
         print('No solution was found.')
-    '''
+    
 
     # Task 4 test code
     '''
