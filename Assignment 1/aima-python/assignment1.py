@@ -96,15 +96,24 @@ class ZenPuzzleGarden(Problem):
 # Task 3
 # Implement an A* heuristic cost function and assign it to the variable below.
 def get_astar_hc(node):
-    state = tuple(tuple(row) for row in node.state[0])
-
-    unsolved_rows = 0
     
-    for row in state:
-        if '' in row:   
-            unsolved_rows += 1
-                
-    return unsolved_rows
+    map = node.state[0]
+
+    unsolved = 0
+
+    rows = len(map)
+    columns = len(map[0])
+
+    
+    if rows < columns:
+        for row in map:
+            if '' in row:   
+                unsolved += 1
+    else:
+        for row in map:
+            if '' in row[0]:   
+                unsolved  += 1
+    return unsolved
 
 astar_heuristic_cost = get_astar_hc
 # astar_heuristic_cost = lambda node: sum(row.count("") for row in node.state[0])
