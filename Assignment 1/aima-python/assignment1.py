@@ -16,7 +16,7 @@ def read_initial_state_from_file(filename):
         for line in f:
             rock_coordinate = line.split(",")
             rock_coordinate[1] = rock_coordinate[1].replace("\n", "")
-            map[0][int(rock_coordinate[0])][int(rock_coordinate[1])] = "rock"
+            map[0][int(rock_coordinate[0])][int(rock_coordinate[1])] = 'rock'
         
         state = tuple(tuple(row) for row in map[0]), None, None
 
@@ -95,16 +95,18 @@ class ZenPuzzleGarden(Problem):
     
 # Task 3
 # Implement an A* heuristic cost function and assign it to the variable below.
-# def get_astar_hc(state):
-#     map = [list(row) for row in state[0]]
-    
-#     unsolved_tiles = 0
-    
-#     for row in map:
-#         for tile in row:
-#             if (tile == ""):
-#                 unsolved_tiles += 1
+def get_astar_hc(node):
+    state = tuple(tuple(row) for row in node.state[0])
 
+    unsolved_rows = 0
+    
+    for row in state:
+        if '' in row:   
+            unsolved_rows += 1
+                
+    return unsolved_rows
+
+astar_heuristic_cost = get_astar_hc
 # astar_heuristic_cost = lambda node: sum(row.count("") for row in node.state[0])
 
 

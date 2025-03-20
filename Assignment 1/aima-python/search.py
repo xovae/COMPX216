@@ -88,8 +88,12 @@ class Node:
     def __repr__(self):
         return "<Node {}>".format(self.state)
 
-    def __lt__(self, node):
-        return self.state < node.state
+    # def __lt__(self, node):
+    #     return self.state < node.state
+    
+    def __lt__(self, other):
+        return (self.path_cost, str(self.state)) < (other.path_cost, str(other.state))
+
 
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
