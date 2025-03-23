@@ -104,15 +104,15 @@ def get_astar_hc(node):
     rows = len(map)
     columns = len(map[0])
 
-    
     if rows < columns:
         for row in map:
-            if '' in row:   
+            if 0 in row:   
                 unsolved += 1
     else:
-        for row in map:
-            if '' in row[0]:   
-                unsolved  += 1
+        for columns_index in range(columns):
+            for row in map:
+                if row[columns_index] == 0:   
+                    unsolved += 1
     return unsolved
 
 astar_heuristic_cost = get_astar_hc
