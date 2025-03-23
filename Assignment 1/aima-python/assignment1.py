@@ -125,8 +125,7 @@ def beam_search(problem, f, beam_width):
     f = memoize(f, 'f')
     node = Node(problem.initial)
     frontier = PriorityQueue('min', f)
-    if len(frontier) < beam_width:
-        frontier.append(node)
+    frontier.append(node)
     explored = set()
     while frontier:
         node = frontier.pop()
@@ -134,12 +133,13 @@ def beam_search(problem, f, beam_width):
             return node
         explored.add(node.state)
         for child in node.expand(problem):
-            if child.state not in explored and child not in frontier:
-                frontier.append(child)
-            elif child in frontier:
-                if f(child) < frontier[child]:
-                    del frontier[child]
-                    frontier.append(child)
+            if len(frontier) < beam_width:
+                if child.state not in explored and child not in frontier:
+                        frontier.append(child)
+                elif child in frontier:
+                    if f(child) < frontier[child]:
+                        del frontier[child]
+                        frontier.append(child)
     return None
 
 if __name__ == "__main__":
@@ -153,16 +153,16 @@ if __name__ == "__main__":
     # Task 2 test code
     
     garden = ZenPuzzleGarden('assignment1config.txt')
-    print('Running breadth-first graph search.')
-    before_time = time()
-    node = breadth_first_graph_search(garden)
-    after_time = time()
-    print(f'Breadth-first graph search took {after_time - before_time} seconds.')
-    if node:
-        print(f'Its solution with a cost of {node.path_cost} is animated below.')
-        animate(node)
-    else:
-        print('No solution was found.')
+    # print('Running breadth-first graph search.')
+    # before_time = time()
+    # node = breadth_first_graph_search(garden)
+    # after_time = time()
+    # print(f'Breadth-first graph search took {after_time - before_time} seconds.')
+    # if node:
+    #     print(f'Its solution with a cost of {node.path_cost} is animated below.')
+    #     animate(node)
+    # else:
+    #     print('No solution was found.')
     
 
     # Task 3 test code
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # Task 4 test code
     print('Running beam search.')
     before_time = time()
-    node = beam_search(garden, lambda n: n.path_cost + astar_heuristic_cost(n), 50)
+    node = beam_search(garden, lambda n: n.path_cost + astar_heuristic_cost(n), 20)
     after_time = time()
     print(f'Beam search took {after_time - before_time} seconds.')
     if node:
