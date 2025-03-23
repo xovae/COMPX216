@@ -10,7 +10,7 @@ def read_initial_state_from_file(filename):
         columns = f.readline()
         
         map = [ 
-            [[0 for _ in range(int(columns))] for _ in range(int(rows))],
+            [["" for _ in range(int(columns))] for _ in range(int(rows))],
         ]
         
         for line in f:
@@ -106,26 +106,41 @@ def get_astar_hc(node):
 
     if rows < columns:
         for row in map:
-            if 0 in row:   
+            if "" in row:   
                 unsolved += 1
+                # print("found an unsolved row!")
     else:
         for columns_index in range(columns):
             for row in map:
-                if row[columns_index] == 0:   
+                if row[columns_index] == "":   
                     unsolved += 1
+                    # print("found an unsolved column!")
     return unsolved
 
 astar_heuristic_cost = get_astar_hc
-# astar_heuristic_cost = lambda node: sum(row.count("") for row in node.state[0])
 
 
 def beam_search(problem, f, beam_width):
-    # Task 4
-    # Implement a beam-width version A* search.
-    # Return a search node containing a solved state.
-    # Experiment with the beam width in the test code to find a solution.
-    # Replace the line below with your code.
-    raise NotImplementedError
+
+    f = memoize(f, 'f')
+    node = Node(problem.initial)
+    frontier = PriorityQueue('min', f)
+    if len(frontier) < beam_width:
+        frontier.append(node)
+    explored = set()
+    while frontier:
+        node = frontier.pop()
+        if problem.goal_test(node.state):
+            return node
+        explored.add(node.state)
+        for child in node.expand(problem):
+            if child.state not in explored and child not in frontier:
+                frontier.append(child)
+            elif child in frontier:
+                if f(child) < frontier[child]:
+                    del frontier[child]
+                    frontier.append(child)
+    return None
 
 if __name__ == "__main__":
 
@@ -165,7 +180,6 @@ if __name__ == "__main__":
     
 
     # Task 4 test code
-    '''
     print('Running beam search.')
     before_time = time()
     node = beam_search(garden, lambda n: n.path_cost + astar_heuristic_cost(n), 50)
@@ -176,4 +190,3 @@ if __name__ == "__main__":
         animate(node)
     else:
         print('No solution was found.')
-    '''

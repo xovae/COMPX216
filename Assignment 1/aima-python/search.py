@@ -89,7 +89,7 @@ class Node:
         return "<Node {}>".format(self.state)
 
     def __lt__(self, node):
-        return str(self.state) < str(node.state)
+        return self.state < node.state
 
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
