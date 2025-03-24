@@ -3,26 +3,27 @@ from search import *
 from assignment1aux import *
 
 def read_initial_state_from_file(filename):
-    # Task 1
-    # Return an initial state constructed using a configuration in a file.
+    # Returns an initial state constructed using a configuration in a file.
     with open(filename, 'r') as f:
+        ##Get the dimensions of the zen garden from the config file
         rows = f.readline()
         columns = f.readline()
         
+        #Construct the nested list to represent the zen garden
         map = [ 
             [["" for _ in range(int(columns))] for _ in range(int(rows))],
         ]
         
+        ##Populate the nested list with any rocks, extracting the coordinates of any from the config file 
         for line in f:
             rock_coordinate = line.split(",")
             rock_coordinate[1] = rock_coordinate[1].replace("\n", "")
             map[0][int(rock_coordinate[0])][int(rock_coordinate[1])] = 'rock'
         
+        ##Initialise state, converting the nested list to a nested tuple and setting the position and direction of the monk to None (not currently in the garden)  
         state = tuple(tuple(row) for row in map[0]), None, None
 
         return state
-
-# read_initial_state_from_file('assignment1config.txt')
 
 class ZenPuzzleGarden(Problem):
     def __init__(self, initial):
@@ -88,38 +89,42 @@ class ZenPuzzleGarden(Problem):
             position = new_position
 
     def goal_test(self, state):
-        # Task 2
+        # Return a boolean value indicating if a given state is solved.
         if all(all(inner_tuple) for inner_tuple in state[0]) and state[1] == None and state[2] == None:
                     return True
         return False
     
 # Task 3
-# Implement an A* heuristic cost function and assign it to the variable below.
 def get_astar_hc(node):
     
+    #Get the map of the zen garden from the current node
     map = node.state[0]
 
+    ##used to track unsolved rows/columns
     unsolved = 0
 
+    #Get the dimensions of the zen garden
     rows = len(map)
     columns = len(map[0])
 
+    #Calculate the heuristic from the smaller dimension
     if rows < columns:
+        #Count any incomplete (unraked) rows 
         for row in map:
             if "" in row:   
                 unsolved += 1
-                # print("found an unsolved row!")
     else:
+        #Count any incomplete (unraked) columns
         for columns_index in range(columns):
             for row in map:
                 if row[columns_index] == "":   
                     unsolved += 1
-                    # print("found an unsolved column!")
     return unsolved
 
+##Assign the heuristic cost function to the variable provided
 astar_heuristic_cost = get_astar_hc
 
-
+##Variation of A* search with a limited frontier size
 def beam_search(problem, f, beam_width):
 
     f = memoize(f, 'f')
@@ -128,18 +133,24 @@ def beam_search(problem, f, beam_width):
     frontier.append(node)
     explored = set()
     while frontier:
+        #Keep the k best nodes where k is beam_width
+        if len(frontier) >= beam_width:
+            best_nodes = heapq.nsmallest(beam_width, frontier.heap, key = lambda x: f(x[1]))
+            frontier.heap = best_nodes
+            heapq.heapify(frontier.heap)
+            
+        #Proceed with best_first_graph_search as normal
         node = frontier.pop()
         if problem.goal_test(node.state):
             return node
         explored.add(node.state)
         for child in node.expand(problem):
-            if len(frontier) < beam_width:
-                if child.state not in explored and child not in frontier:
-                        frontier.append(child)
-                elif child in frontier:
-                    if f(child) < frontier[child]:
-                        del frontier[child]
-                        frontier.append(child)
+            if child.state not in explored and child not in frontier:
+                    frontier.append(child)
+            elif child in frontier:
+                if f(child) < frontier[child]:
+                    del frontier[child]
+                    frontier.append(child)
     return None
 
 if __name__ == "__main__":
