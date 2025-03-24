@@ -137,7 +137,6 @@ def beam_search(problem, f, beam_width):
         if len(frontier) >= beam_width:
             best_nodes = heapq.nsmallest(beam_width, frontier.heap, key = lambda x: f(x[1]))
             frontier.heap = best_nodes
-            heapq.heapify(frontier.heap)
             
         #Proceed with best_first_graph_search as normal
         node = frontier.pop()
