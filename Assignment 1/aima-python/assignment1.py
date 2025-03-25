@@ -158,12 +158,12 @@ if __name__ == "__main__":
     # Task 1 test code
     
     print('The loaded initial state is visualised below.')
-    visualise(read_initial_state_from_file('assignment1config3.txt'))
+    visualise(read_initial_state_from_file('assignment1config.txt'))
     
 
     # Task 2 test code
     
-    garden = ZenPuzzleGarden('assignment1config3.txt')
+    garden = ZenPuzzleGarden('assignment1config.txt')
     print('Running breadth-first graph search.')
     before_time = time()
     node = breadth_first_graph_search(garden)
