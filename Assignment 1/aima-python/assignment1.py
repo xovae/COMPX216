@@ -107,7 +107,7 @@ def get_astar_hc(node):
     rows = len(map)
     columns = len(map[0])
 
-    #Calculate the heuristic from the smaller dimension
+    #Calculate the heuristic from the smaller dimension. If tied, rows are preferred due to using a less computationally intensive method
     if columns < rows:
         #Count any incomplete (unraked) columns
         map_transpose = zip(*map) 
