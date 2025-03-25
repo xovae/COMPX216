@@ -108,24 +108,24 @@ def get_astar_hc(node):
     columns = len(map[0])
 
     #Calculate the heuristic from the smaller dimension
-    if rows < columns:
-        #Count any incomplete (unraked) rows 
+    if columns < rows:
+        #Count any incomplete (unraked) columns
+        map_transpose = zip(*map) 
+        for row in map_transpose:
+            if "" in row:
+                unsolved += 1
+    else:
+        # Count any incomplete (unraked) rows 
         for row in map:
             if "" in row:   
                 unsolved += 1
-    else:
-        #Count any incomplete (unraked) columns
-        for columns_index in range(columns):
-            for row in map:
-                if row[columns_index] == "":   
-                    unsolved += 1
-                       
+      
     return unsolved
 
-##Assign the heuristic cost function to the variable provided
+#Assign the heuristic cost function to the variable provided
 astar_heuristic_cost = get_astar_hc
 
-##Variation of A* search with a limited frontier size
+#Variation of A* search with a limited frontier size
 def beam_search(problem, f, beam_width):
 
     f = memoize(f, 'f')
@@ -158,12 +158,12 @@ if __name__ == "__main__":
     # Task 1 test code
     
     print('The loaded initial state is visualised below.')
-    visualise(read_initial_state_from_file('assignment1config.txt'))
+    visualise(read_initial_state_from_file('assignment1config3.txt'))
     
 
     # Task 2 test code
     
-    garden = ZenPuzzleGarden('assignment1config.txt')
+    garden = ZenPuzzleGarden('assignment1config3.txt')
     print('Running breadth-first graph search.')
     before_time = time()
     node = breadth_first_graph_search(garden)
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     
     print('Running beam search.')
     before_time = time()
-    node = beam_search(garden, lambda n: n.path_cost + astar_heuristic_cost(n), 20)
+    node = beam_search(garden, lambda n: n.path_cost + astar_heuristic_cost(n), 150)
     after_time = time()
     print(f'Beam search took {after_time - before_time} seconds.')
     if node:
