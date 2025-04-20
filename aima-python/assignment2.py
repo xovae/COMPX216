@@ -36,36 +36,94 @@ class KNetWalk(Problem):
         return self.value(state) == self.max_fitness
 
     def value(self, state):
-        # Task 1
-        # Return an integer fitness value of a given state.
-        # Replace the line below with your code.
-        raise NotImplementedError
+        # Returns an integer fitness value of a given state.
+        i = 0
+        height = len(self.tiles)
+        width = len(self.tiles[0])
+        map = [[0 for _ in range(len(self.tiles[0]))] for _ in range(len(self.tiles))]
+        for row in self.tiles:
+            j = 0
+            for tile in row:
+                map[i][j] = tuple((con + state[i * width + j]) % 4 for con in tile)
+                j += 1
+            i += 1
+            
+        i = 0
+        fitness_value = 0
+        for row in map:
+            j = 0
+            for tile in row:
+                # If there is a tile above
+                if (i - 1) >= 0:
+                    if 1 in map[i][j] and 3 in map[i - 1][j]:
+                        fitness_value += 1
+                # If there is a tile below
+                if (i + 1) < height:
+                    if 3 in map[i][j] and 1 in map[i + 1][j]:
+                        fitness_value += 1
+                # If there is a tile to the left
+                if (j - 1) >= 0:
+                    if 2 in map[i][j] and 0 in map[i][j - 1]:
+                        fitness_value += 1
+                # If there is a tile to the right
+                if (j + 1) < width:
+                    if 0 in map[i][j] and 2 in map[i][j + 1]:
+                        fitness_value += 1
+                j += 1
+            i += 1
+                
+        return fitness_value
 
-# Task 2
-# Configure an exponential schedule for simulated annealing.
-sa_schedule = exp_schedule(k=20, lam=0.005, limit=100)
+# Configuring an exponential schedule for simulated annealing.
+sa_schedule = exp_schedule(k=10, lam=0.1, limit=1000)
 
-# Task 3
-# Configure parameters for the genetic algorithm.
-pop_size = None
+# Configuring parameters for the genetic algorithm.
+pop_size = 20
 num_gen = 1000
 mutation_prob = 0.1
 
 def local_beam_search(problem, population):
-    # Task 4
-    # Implement local beam search.
-    # Return a goal state if found in the population.
-    # Return the fittest state in the population if the next population contains no fitter state.
-    # Replace the line below with your code.
-    raise NotImplementedError
+
+    population_size = len(population)
+    current_pop = [Node(state) for state in population]
+    current_pop = sorted(current_pop, key=lambda node: problem.value(node.state), reverse = True)
+    while True:
+        next_pop = [] 
+        for node in current_pop:
+            next_pop.extend(node.expand(problem))
+        if not next_pop:
+            break
+        next_pop = sorted(next_pop, key=lambda node: problem.value(node.state), reverse=True)[:population_size]
+        if problem.value(next_pop[0].state) <= problem.value(current_pop[0].state):
+            break
+        current_pop = next_pop
+    return current_pop[0].state
+
 
 def stochastic_beam_search(problem, population, limit=1000):
     # Task 5
-    # Implement stochastic beam search.
-    # Return a goal state if found in the population.
-    # Return the fittest state in the population if the generation limit is reached.
-    # Replace the line below with your code.
-    raise NotImplementedError
+    population_size = len(population)
+    current_pop = [Node(state) for state in population]
+    current_pop = sorted(current_pop, key=lambda node: problem.value(node.state), reverse = True)
+    for i in range(limit):
+        next_pop = [] 
+        for node in current_pop:
+            next_pop.extend(node.expand(problem))
+        if not next_pop:
+            break
+        
+        fitness_values = np.array([problem.value(node.state) for node in next_pop], dtype=float)
+        fitness_sum = np.sum(fitness_values)
+        probabilities = fitness_values / fitness_sum
+        
+        next_pop = np.random.choice(next_pop, population_size, False, probabilities)
+        next_pop = sorted(next_pop, key=lambda node: problem.value(node.state), reverse=True)
+        
+        if network.goal_test(next_pop[0].state):
+            return next_pop[0].state
+        
+        current_pop = next_pop
+    return current_pop[0].state
 
 if __name__ == '__main__':
 
@@ -73,83 +131,83 @@ if __name__ == '__main__':
     visualise(network.tiles, network.initial)
 
     # Task 1 test code
-    '''
-    run = 0
-    method = 'hill climbing'
-    while True:
-        network = KNetWalk('assignment2config.txt')
-        state = hill_climbing(network)
-        if network.goal_test(state):
-            break
-        else:
-            print(f'{method} run {run}: no solution found')
-            print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
-            visualise(network.tiles, state)
-        run += 1
-    print(f'{method} run {run}: solution found')
-    visualise(network.tiles, state)
-    '''
+
+    # run = 0
+    # method = 'hill climbing'
+    # while True:
+    #     network = KNetWalk('assignment2config.txt')
+    #     state = hill_climbing(network)
+    #     if network.goal_test(state):
+    #         break
+    #     else:
+    #         print(f'{method} run {run}: no solution found')
+    #         print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
+    #         visualise(network.tiles, state)
+    #     run += 1
+    # print(f'{method} run {run}: solution found')
+    # visualise(network.tiles, state)
+
 
     # Task 2 test code
-    '''
-    run = 0
-    method = 'simulated annealing'
-    while True:
-        network = KNetWalk('assignment2config.txt')
-        state = simulated_annealing(network, schedule=sa_schedule)
-        if network.goal_test(state):
-            break
-        else:
-            print(f'{method} run {run}: no solution found')
-            print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
-            visualise(network.tiles, state)
-        run += 1
-    print(f'{method} run {run}: solution found')
-    visualise(network.tiles, state)
-    '''
+    
+    # run = 0
+    # method = 'simulated annealing'
+    # while True:
+    #     network = KNetWalk('assignment2config.txt')
+    #     state = simulated_annealing(network, schedule=sa_schedule)
+    #     if network.goal_test(state):
+    #         break
+    #     else:
+    #         print(f'{method} run {run}: no solution found')
+    #         print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
+    #         visualise(network.tiles, state)
+    #     run += 1
+    # print(f'{method} run {run}: solution found')
+    # visualise(network.tiles, state)
+    
 
     # Task 3 test code
-    '''
-    run = 0
-    method = 'genetic algorithm'
-    while True:
-        network = KNetWalk('assignment2config.txt')
-        height = len(network.tiles)
-        width = len(network.tiles[0])
-        state = genetic_algorithm([network.generate_random_state() for _ in range(pop_size)], network.value, [0, 1, 2, 3], network.max_fitness, num_gen, mutation_prob)
-        if network.goal_test(state):
-            break
-        else:
-            print(f'{method} run {run}: no solution found')
-            print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
-            visualise(network.tiles, state)
-        run += 1
-    print(f'{method} run {run}: solution found')
-    visualise(network.tiles, state)
-    '''
+    
+    # run = 0
+    # method = 'genetic algorithm'
+    # while True:
+    #     network = KNetWalk('assignment2config.txt')
+    #     height = len(network.tiles)
+    #     width = len(network.tiles[0])
+    #     state = genetic_algorithm([network.generate_random_state() for _ in range(pop_size)], network.value, [0, 1, 2, 3], network.max_fitness, num_gen, mutation_prob)
+    #     if network.goal_test(state):
+    #         break
+    #     else:
+    #         print(f'{method} run {run}: no solution found')
+    #         print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
+    #         visualise(network.tiles, state)
+    #     run += 1
+    # print(f'{method} run {run}: solution found')
+    # visualise(network.tiles, state)
+    
 
     # Task 4 test code
-    '''
-    run = 0
-    method = 'local beam search'
-    while True:
-        network = KNetWalk('assignment2config.txt')
-        height = len(network.tiles)
-        width = len(network.tiles[0])
-        state = local_beam_search(network, [network.generate_random_state() for _ in range(100)])
-        if network.goal_test(state):
-            break
-        else:
-            print(f'{method} run {run}: no solution found')
-            print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
-            visualise(network.tiles, state)
-        run += 1
-    print(f'{method} run {run}: solution found')
-    visualise(network.tiles, state)
-    '''
-
+    
+    # run = 0
+    # method = 'local beam search'
+    # while True:
+    #     network = KNetWalk('assignment2config.txt')
+    #     height = len(network.tiles)
+    #     width = len(network.tiles[0])
+    #     state = local_beam_search(network, [network.generate_random_state() for _ in range(100)])
+    #     if network.goal_test(state):
+    #         break
+    #     else:
+    #         print(f'{method} run {run}: no solution found')
+    #         print(f'best state fitness {network.value(state)} out of {network.max_fitness}')
+    #         visualise(network.tiles, state)
+    #     run += 1
+    # print(f'{method} run {run}: solution found')
+    # visualise(network.tiles, state)
+    
+    
     # Task 5 test code
-    '''
+    
     run = 0
     method = 'stochastic beam search'
     while True:
@@ -166,4 +224,3 @@ if __name__ == '__main__':
         run += 1
     print(f'{method} run {run}: solution found')
     visualise(network.tiles, state)
-    '''
