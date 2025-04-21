@@ -127,11 +127,11 @@ def stochastic_beam_search(problem, population, limit=1000):
         if not next_pop:
             break
         #Get the fitness values of each child state, storing it in a float array
-        fitness_values = np.array([problem.value(node.state) for node in next_pop], dtype=float)
+        fitness_values = [problem.value(node.state) for node in next_pop]
         #Get the sum of fitness values
-        fitness_sum = np.sum(fitness_values)
+        fitness_sum = sum(fitness_values)
         #Divide each fitness value by the sum of fitness values to get the weighted probabilities
-        probabilities = fitness_values / fitness_sum
+        probabilities = np.divide(fitness_values, fitness_sum)
         
         #Choose population_size states from the child population using weighted random sampling 
         next_pop = np.random.choice(next_pop, population_size, False, probabilities)
