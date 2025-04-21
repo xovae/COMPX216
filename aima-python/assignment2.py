@@ -1,6 +1,7 @@
 from search import *
 from random import randint
 from assignment2aux import *
+import numpy as np
 
 def read_tiles_from_file(filename):
     lines = [line.rstrip('\n') for line in open(filename, 'r').readlines()]
