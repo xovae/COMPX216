@@ -38,25 +38,19 @@ class KNetWalk(Problem):
     # Returns an integer fitness value of a given state.
     def value(self, state):
         
-        i = 0
         height = len(self.tiles)
         width = len(self.tiles[0])
         
         #Construct a nested tuple representation of the state by combining the original tile layout and any rotations applied
         map = [[0 for _ in range(width)] for _ in range(height)]
-        for row in self.tiles:
-            j = 0
-            for tile in row:
-                map[i][j] = tuple((con + state[i * width + j]) % 4 for con in tile)
-                j += 1
-            i += 1
+        for i in range(height):
+            for j in range(width):
+                map[i][j] = tuple((con + state[i * width + j]) % 4 for con in self.tiles[i][j])
             
-        i = 0
         fitness_value = 0
         #Check for any connections between tiles
-        for row in map:
-            j = 0
-            for tile in row:
+        for i in range(height):
+            for j in range(width):
                 # If there is a tile above
                 if (i - 1) >= 0:
                     if 1 in map[i][j] and 3 in map[i - 1][j]:
@@ -73,9 +67,7 @@ class KNetWalk(Problem):
                 if (j + 1) < width:
                     if 0 in map[i][j] and 2 in map[i][j + 1]:
                         fitness_value += 1
-                j += 1
-            i += 1
-                
+
         return fitness_value
 
 # Configuring an exponential schedule for simulated annealing.
@@ -85,7 +77,6 @@ sa_schedule = exp_schedule(k=10, lam=0.1, limit=1000)
 pop_size = 20
 num_gen = 1000
 mutation_prob = 0.1
-
 
 def local_beam_search(problem, population):
 
