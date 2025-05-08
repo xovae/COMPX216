@@ -181,28 +181,28 @@ if __name__ == '__main__':
     sequence = tokenise('assignment3corpus.txt')
 
     # Task 1.1 test code
-    # model = build_unigram(sequence[:20])
-    # print(model)
+    model = build_unigram(sequence[:20])
+    print(model)
 
     # # Task 1.2 test code
-    # model = build_bigram(sequence[:20])
-    # print(model)
+    model = build_bigram(sequence[:20])
+    print(model)
 
     # Task 1.3 test code
-    # model = build_n_gram(sequence[:20], 5)
-    # print(model)
+    model = build_n_gram(sequence[:20], 5)
+    print(model)
 
     # Task 2 test code
-    # print(query_n_gram(model, tuple(sequence[:4])))
+    print(query_n_gram(model, tuple(sequence[:4])))
 
     # Task 3 test code
     models = [build_n_gram(sequence, i) for i in range(10, 0, -1)]
-    # head = []
-    # for _ in range(100):
-    #     tail = sample(head, models)
-    #     print(tail, end=' ')
-    #     head.append(tail)
-    # print()
+    head = []
+    for _ in range(100):
+        tail = sample(head, models)
+        print(tail, end=' ')
+        head.append(tail)
+    print()
 
     # Task 4.1 test code
     print(log_likelihood_ramp_up(sequence[:20], models))
