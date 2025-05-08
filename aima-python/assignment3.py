@@ -104,7 +104,9 @@ def sample(sequence, models):
         model_length = len(list(model.keys())[0])
         #Check if the sequence is of sufficient length (length is equal to or greater than the model's n-1 value)
         if len(sequence) >= model_length:
-            pred = query_n_gram(model, tuple(sequence[-model_length:]))
+            # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
+            context = sequence[-model_length:] if model_length > 0 else []
+            pred = query_n_gram(model, tuple(context))
             if pred is not None:
                 preds.append(pred)
                 
@@ -174,7 +176,9 @@ def log_likelihood_blended(sequence, models):
     
             #Check if the context is of sufficient length for the current model
             if len(context) >= model_length:
-                pred = query_n_gram(model, context[-model_length:])
+                # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
+                context = context[-model_length:] if model_length > 0 else []
+                pred = query_n_gram(model, tuple(context))
                 #Check if the context does exist in the current model
                 if pred is not None:
                     preds.append(pred)
