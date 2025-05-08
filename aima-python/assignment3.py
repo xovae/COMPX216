@@ -10,8 +10,10 @@ def build_unigram(sequence):
     # Return a unigram model.
     inner_dict = {} 
     for word in sequence:
+        #Increment the associated value by 1 if the word already exists in the dictionary
         if word in inner_dict:
             inner_dict[word] += 1
+        #If not, add the word and set the value to one
         else:
             inner_dict[word] = 1
     outer_dict = {(): inner_dict}
@@ -25,10 +27,12 @@ def build_bigram(sequence):
         if sequence[i] not in outer_dict:
             outer_dict[(sequence[i])] = {}
         
-        #Check if the following token is in the dictionary
+        #Check if the following token is in the dictionary for the current context
         following_token = sequence[i + 1]
+        #If it is, increment the value by 1
         if following_token in outer_dict[sequence[i]]:
             outer_dict[sequence[i]][following_token] += 1
+        #If not, add the token and set it's value to one
         else:
             outer_dict[sequence[i]][following_token] = 1
 
@@ -49,11 +53,12 @@ def build_n_gram(sequence, n):
         if context not in outer_dict:
             outer_dict[context] = {}
             
-        #Check if the following token is in the dictionary 
+        #Check if the following token is in the dictionary for the current context
         following_token = sequence[i + (n-1)]
-        
+        #If it is, increment the value by one
         if following_token in outer_dict[context]:
             outer_dict[context][following_token] += 1
+        #If not, add the token and set it's value to one
         else:
             outer_dict[context][following_token] = 1
     return outer_dict
