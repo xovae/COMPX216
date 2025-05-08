@@ -110,31 +110,71 @@ def sample(sequence, models):
 def log_likelihood_ramp_up(sequence, models):
     # Return a log likelihood value of the sequence based on the models.
     log_likelihood_sum = 0.0
-    for i in range(len(sequence) - 1):
+    
+    for i in range(len(sequence)):
+        #Get the n-gram model   
         if i < len(models):
             model = models[-(i+1)]
         else:
             model = models[0]
             
-        context_length = len(list(model.keys())[0])
-        context = tuple(sequence[i + 1 - context_length:i+1])
-        token = sequence[i+1]
+        #Get the n-value of the model
+        n = len(list(model.keys())[0]) + 1
+
+        #Get the context and token
+        context = tuple(sequence[i - (n - 1):i])
+        token = sequence[i]
+
+        #Get the dictionary entry for the corresponding context
+        context_values = query_n_gram(model, context)
         
-        context_values = model.get(context)
+        #Check if the context does not exist in the dictionary for the given model, or the token does not exist for the given context 
         if not context_values or token not in context_values:
             return -math.inf
+        
+        #Calculate the probability of the given token occurring given the current context
         prob_sum = sum(context_values.values())
         prob = context_values[token] / prob_sum
         
+        #Add the probability to the log sum
         log_likelihood_sum += math.log(prob)
     
     return log_likelihood_sum
         
 def log_likelihood_blended(sequence, models):
-    # Task 4.2
     # Return a log likelihood value of the sequence based on the models.
-    # Replace the line below with your code.
-    raise NotImplementedError
+    blended_log_likelihood_sum = 0.0
+    
+    for i in range(len(sequence)):
+        
+        preds = []
+        token = sequence[i]
+        
+        # Get the probability of the current token given the current context for each model
+        for model in models:
+            #Get the n-value of the model
+            n = len(list(model.keys())[0]) + 1
+            
+            context = tuple(sequence[i - (n - 1):i])
+            pred = query_n_gram(model, context)
+            #If the context does exist in the current model
+            if pred is not None:
+                preds.append(pred)
+            
+        #Get the blended probability
+        probs = blended_probabilities(preds)
+        
+        #Check if the token does not exist in blended probabilities
+        if token not in probs:
+            return -math.inf
+        
+        #Calculate the probability of the given token occurring given the current context from each model
+        prob = probs[token]
+        
+        #Add the probability to the log sum
+        blended_log_likelihood_sum += math.log(prob)
+    
+    return blended_log_likelihood_sum
 
 if __name__ == '__main__':
 
@@ -149,7 +189,7 @@ if __name__ == '__main__':
     # print(model)
 
     # Task 1.3 test code
-    model = build_n_gram(sequence[:20], 5)
+    # model = build_n_gram(sequence[:20], 5)
     # print(model)
 
     # Task 2 test code
@@ -168,6 +208,4 @@ if __name__ == '__main__':
     print(log_likelihood_ramp_up(sequence[:20], models))
 
     # Task 4.2 test code
-    '''
     print(log_likelihood_blended(sequence[:20], models))
-    '''
