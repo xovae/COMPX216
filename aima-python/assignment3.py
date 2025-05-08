@@ -95,9 +95,9 @@ def sample(sequence, models):
     # Return a token sampled from blended predictions.
     preds = []
     for model in models:
-        #Get length of the model
+        #Get the context length (n-1) of the model
         model_length = len(list(model.keys())[0])
-        #Check if the sequence is of sufficient length (length is equal to or greater than the model's n value)
+        #Check if the sequence is of sufficient length (length is equal to or greater than the model's n-1 value)
         if len(sequence) >= model_length:
             pred = query_n_gram(model, tuple(sequence[-model_length:]))
             if pred is not None:
@@ -112,17 +112,17 @@ def log_likelihood_ramp_up(sequence, models):
     log_likelihood_sum = 0.0
     
     for i in range(len(sequence)):
-        #Get the n-gram model   
+        #Get the n-gram model
         if i < len(models):
             model = models[-(i+1)]
         else:
             model = models[0]
             
-        #Get the n-value of the model
-        n = len(list(model.keys())[0]) + 1
+        #Get the context length (n-1) of the model
+        model_length = len(list(model.keys())[0])
 
         #Get the context and token
-        context = tuple(sequence[i - (n - 1):i])
+        context = tuple(sequence[i - model_length:i])
         token = sequence[i]
 
         #Get the dictionary entry for the corresponding context
@@ -148,19 +148,32 @@ def log_likelihood_blended(sequence, models):
     for i in range(len(sequence)):
         
         preds = []
+        
+        #Get the n-gram model
+        if i < len(models):
+            model = models[-(i+1)]
+        else:
+            model = models[0]
+            
+        #Get the context length (n-1) of the model
+        model_length = len(list(model.keys())[0])
+
+        #Get the context and token
+        context = tuple(sequence[i - model_length:i])
         token = sequence[i]
         
-        # Get the probability of the current token given the current context for each model
+        # Get the probability of the current token given the current context for each applicable model
         for model in models:
-            #Get the n-value of the model
-            n = len(list(model.keys())[0]) + 1
-            
-            context = tuple(sequence[i - (n - 1):i])
-            pred = query_n_gram(model, context)
-            #If the context does exist in the current model
-            if pred is not None:
-                preds.append(pred)
-            
+            #Get the context length (n-1) of the model
+            model_length = len(list(model.keys())[0])
+    
+            #Check if the context is of sufficient length for the model
+            if len(context) >= model_length:
+                pred = query_n_gram(model, context[-model_length:])
+                #If the context does exist in the current model
+                if pred is not None:
+                    preds.append(pred)
+
         #Get the blended probability
         probs = blended_probabilities(preds)
         
