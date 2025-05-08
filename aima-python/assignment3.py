@@ -65,7 +65,7 @@ def build_n_gram(sequence, n):
     
 
 def query_n_gram(model, sequence):
-    # Return a prediction as a dictionary.
+    # Return a prediction as a dictionary, if the given sequence is present in the given model.
     if sequence in model:
         return model[sequence]
     else:
@@ -169,13 +169,13 @@ def log_likelihood_blended(sequence, models):
         
         # Get the probability of the current token given the current context for each applicable model
         for model in models:
-            #Get the context length (n-1) of the model
+            #Get the context length (n-1) of the current model
             model_length = len(list(model.keys())[0])
     
-            #Check if the context is of sufficient length for the model
+            #Check if the context is of sufficient length for the current model
             if len(context) >= model_length:
                 pred = query_n_gram(model, context[-model_length:])
-                #If the context does exist in the current model
+                #Check if the context does exist in the current model
                 if pred is not None:
                     preds.append(pred)
 
