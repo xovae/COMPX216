@@ -23,18 +23,20 @@ def build_bigram(sequence):
     # Return a bigram model.
     outer_dict = {}
     for i in range(len(sequence) - 1):
+        #Get the current context
+        context = (sequence[i],)
         #If the context is not already in the dictionary, add it
-        if sequence[i] not in outer_dict:
-            outer_dict[(sequence[i])] = {}
+        if context not in outer_dict:
+            outer_dict[context] = {}
         
         #Check if the following token is in the dictionary for the current context
         following_token = sequence[i + 1]
         #If it is, increment the value by 1
-        if following_token in outer_dict[sequence[i]]:
-            outer_dict[sequence[i]][following_token] += 1
+        if following_token in outer_dict[context]:
+            outer_dict[context][following_token] += 1
         #If not, add the token and set it's value to one
         else:
-            outer_dict[sequence[i]][following_token] = 1
+            outer_dict[context][following_token] = 1
 
     return outer_dict
 
