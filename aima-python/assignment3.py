@@ -23,7 +23,6 @@ def build_bigram(sequence):
     # Return a bigram model.
     outer_dict = {}
     for i in range(len(sequence) - 1):
-        #Get the current context
         context = (sequence[i],)
         #If the context is not already in the dictionary, add it
         if context not in outer_dict:
@@ -31,10 +30,8 @@ def build_bigram(sequence):
         
         #Check if the following token is in the dictionary for the current context
         following_token = sequence[i + 1]
-        #If it is, increment the value by 1
         if following_token in outer_dict[context]:
             outer_dict[context][following_token] += 1
-        #If not, add the token and set it's value to one
         else:
             outer_dict[context][following_token] = 1
 
@@ -57,10 +54,8 @@ def build_n_gram(sequence, n):
             
         #Check if the following token is in the dictionary for the current context
         following_token = sequence[i + (n-1)]
-        #If it is, increment the value by one
         if following_token in outer_dict[context]:
             outer_dict[context][following_token] += 1
-        #If not, add the token and set it's value to one
         else:
             outer_dict[context][following_token] = 1
     return outer_dict
@@ -102,9 +97,9 @@ def sample(sequence, models):
     # Return a token sampled from blended predictions.
     preds = []
     for model in models:
-        #Get the context length (n-1) of the model
+        #Get the context window
         context_size = len(list(model.keys())[0])
-        #Check if the sequence is of sufficient length (length is equal to or greater than the model's n-1 value)
+        #Check if the sequence is of sufficient length (length is equal to or greater than the context window)
         if len(sequence) >= context_size:
             # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
             context = sequence[-context_size:] if context_size > 0 else []
@@ -127,10 +122,7 @@ def log_likelihood_ramp_up(sequence, models):
         else:
             model = models[0]
             
-        #Get the context length (n-1) of the model
         context_size = len(list(model.keys())[0])
-
-        #Get the context and token
         context = tuple(sequence[i - context_size:i])
         token = sequence[i]
 
@@ -144,8 +136,6 @@ def log_likelihood_ramp_up(sequence, models):
         #Calculate the probability of the given token occurring given the current context
         prob_sum = sum(context_values.values())
         prob = context_values[token] / prob_sum
-        
-        #Add the probability to the log sum
         log_likelihood_sum += math.log(prob)
     
     return log_likelihood_sum
@@ -164,16 +154,12 @@ def log_likelihood_blended(sequence, models):
         else:
             model = models[0]
             
-        #Get the context length (n-1) of the model
         context_size = len(list(model.keys())[0])
-
-        #Get the context and token
         context = tuple(sequence[i - context_size:i])
         token = sequence[i]
         
         # Get the probability of the current token given the current context for each applicable model
         for model in models:
-            #Get the context length (n-1) of the current model
             context_size = len(list(model.keys())[0])
     
             #Check if the context is of sufficient length for the current model
@@ -181,7 +167,6 @@ def log_likelihood_blended(sequence, models):
                 # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
                 context = context[-context_size:] if context_size > 0 else []
                 pred = query_n_gram(model, tuple(context))
-                #Check if the context does exist in the current model
                 if pred is not None:
                     preds.append(pred)
 
@@ -191,11 +176,9 @@ def log_likelihood_blended(sequence, models):
         #Check if the token does not exist in blended probabilities
         if token not in probs:
             return -math.inf
-        
-        #Calculate the probability of the given token occurring given the current context from each model
+
+        #Get the probability of the token appearing, and add it to the blended log sum
         prob = probs[token]
-        
-        #Add the probability to the log sum
         blended_log_likelihood_sum += math.log(prob)
     
     return blended_log_likelihood_sum
