@@ -101,11 +101,11 @@ def sample(sequence, models):
     preds = []
     for model in models:
         #Get the context length (n-1) of the model
-        model_length = len(list(model.keys())[0])
+        context_size = len(list(model.keys())[0])
         #Check if the sequence is of sufficient length (length is equal to or greater than the model's n-1 value)
-        if len(sequence) >= model_length:
+        if len(sequence) >= context_size:
             # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
-            context = sequence[-model_length:] if model_length > 0 else []
+            context = sequence[-context_size:] if context_size > 0 else []
             pred = query_n_gram(model, tuple(context))
             if pred is not None:
                 preds.append(pred)
@@ -126,10 +126,10 @@ def log_likelihood_ramp_up(sequence, models):
             model = models[0]
             
         #Get the context length (n-1) of the model
-        model_length = len(list(model.keys())[0])
+        context_size = len(list(model.keys())[0])
 
         #Get the context and token
-        context = tuple(sequence[i - model_length:i])
+        context = tuple(sequence[i - context_size:i])
         token = sequence[i]
 
         #Get the dictionary entry for the corresponding context
@@ -163,21 +163,21 @@ def log_likelihood_blended(sequence, models):
             model = models[0]
             
         #Get the context length (n-1) of the model
-        model_length = len(list(model.keys())[0])
+        context_size = len(list(model.keys())[0])
 
         #Get the context and token
-        context = tuple(sequence[i - model_length:i])
+        context = tuple(sequence[i - context_size:i])
         token = sequence[i]
         
         # Get the probability of the current token given the current context for each applicable model
         for model in models:
             #Get the context length (n-1) of the current model
-            model_length = len(list(model.keys())[0])
+            context_size = len(list(model.keys())[0])
     
             #Check if the context is of sufficient length for the current model
-            if len(context) >= model_length:
+            if len(context) >= context_size:
                 # Capture the last (n-1) tokens in the context to fit the current model (for a unigram, give an empty context)
-                context = context[-model_length:] if model_length > 0 else []
+                context = context[-context_size:] if context_size > 0 else []
                 pred = query_n_gram(model, tuple(context))
                 #Check if the context does exist in the current model
                 if pred is not None:
