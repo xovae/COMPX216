@@ -87,7 +87,7 @@ def train_and_test(model, training_data, test_data, iterations, epochs, report=F
         plot_model_and_dataset(model, test_X, test_y)
 
     # Initialise the optimizer.
-    optimizer = Optimizer(model.parameters, 0.1)
+    optimizer = Optimizer(model.parameters(), 0.1)
 
     for iter_i in range(iterations):
 
@@ -122,8 +122,8 @@ def train_and_test(model, training_data, test_data, iterations, epochs, report=F
 
 # Task 4
 # Initialise a wider model and a deeper model.
-model_wide = NN(nin=2, nouts=[8,8,8,1])
-model_deep = NN(nin=2, nouts=[16,1])
+model_wide = NN(nin=2, nouts=[16,1])
+model_deep = NN(nin=2, nouts=[8,8,8,1])
 
 def test_training_set_sizes(sizes, model):
     sizes = sorted(sizes)
@@ -139,7 +139,7 @@ def test_training_set_sizes(sizes, model):
         # Create a training set of the specified size.
         # Obtain the training and test losses and accuracy of the model.
         training_X, training_y = make_circles(noise=0.1)
-        training_losses, training_accs, test_losses, test_accs = train_and_test(model, (training_X, training_y), (test_X, test_y), 10, 100, True)
+        training_losses, training_accs, test_losses, test_accs = train_and_test(model, (training_X, training_y), (test_X, test_y), 10, 100, False)
 
         recorded_training_losses.append(training_losses[-1])
         recorded_training_accs.append(training_accs[-1])
