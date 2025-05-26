@@ -139,7 +139,7 @@ def test_training_set_sizes(sizes, model):
         # Create a training set of the specified size.
         # Obtain the training and test losses and accuracy of the model.
         training_X, training_y = make_circles(noise=0.1)
-        training_losses, training_accs, test_losses, test_accs = train_and_test(model, (training_X, training_y), (test_X, test_y), 10, 100, False)
+        training_losses, training_accs, test_losses, test_accs = train_and_test(model, (training_X, training_y), (test_X, test_y), 10, 1000, False)
 
         recorded_training_losses.append(training_losses[-1])
         recorded_training_accs.append(training_accs[-1])
